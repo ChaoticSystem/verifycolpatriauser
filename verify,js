@@ -135,23 +135,3 @@ var buenos = [];
 
 
 
-/*
-["52372277", "12345678"].map( async cedula => {
-	await fetch("https://www.banco.colpatria.com.co/banca-virtual/api/customer/contact-info", {
-	  "headers": {
-		"content-type": "application/json"
-	  },
-	  "referrer": "https://www.banco.colpatria.com.co/banca-virtual/login/olvido-contrasena/datos-basicos",
-	  "referrerPolicy": "no-referrer-when-downgrade",
-	  "body": "{\"documentType\":\"C\",\"documentNumber\":\""+cedula+"\"}",
-	  "method": "POST",
-	  "mode": "cors",
-	  "credentials": "omit"
-	}).then(async r => {
-		console.log(r);
-		console.log(await r.text());
-	});
-});
-*/
-
-/*version 72 de crhome*/
