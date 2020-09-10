@@ -3,10 +3,7 @@
 
 
 //add "CC,CE,PASSP" ; "Phone Number" on console 
-var dbText = `21324259;3112951399
-19896429;3112951399
-
-`;
+var dbText = `;`;
 
 
 async function sleep(...a){ return new Promise(r => setTimeout(r, a[0] || 0x3e8 / 0x3c)); };
