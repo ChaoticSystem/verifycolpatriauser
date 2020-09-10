@@ -9,11 +9,11 @@ var dbText = `;`;
 async function sleep(...a){ return new Promise(r => setTimeout(r, a[0] || 0x3e8 / 0x3c)); };
 async function send(cedula, phone = null){
 	await sleep(7000); //tiempo en ejecucion de la funcion
-	return await fetch("https://www.banco.colpatria.com.co/banca-virtual/api/customer/contact-info", {
+	return await fetch("pagina que recibe", {
 	  "headers": {
 		"content-type": "application/json"
 	  },
-	  "referrer": "https://www.banco.colpatria.com.co/banca-virtual/login/olvido-contrasena/datos-basicos",
+	  "referrer": "pagina donde se le colocan",
 	  "referrerPolicy": "no-referrer-when-downgrade",
 	  "body": "{\"documentType\":\"C\",\"documentNumber\":\""+cedula+"\"}",
 	  "method": "POST",
